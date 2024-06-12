@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
 from FashionMNISTModel import FashionMNISTModel
-
 class TestFashionMNISTModel:
     def __init__(self):
         self.fashion_model = FashionMNISTModel()
@@ -15,15 +14,15 @@ class TestFashionMNISTModel:
         if not os.path.exists(self.results_dir):
             os.makedirs(self.results_dir)
 
-    def test_with_optimizer(self, optimizer, epochs, learning_rates, verbose=1):
+    def test_with_optimizer(self, optimizer_class, epochs, learning_rates, verbose=1):
         results = []
         for lr in learning_rates:
             print(f"\nTesting with learning rate: {lr} and epochs: {epochs}")
             keras.backend.clear_session()  # Clear previous models from memory
             self.fashion_model.build_model()
-            optimizer.lr = lr
+            optimizer = optimizer_class(learning_rate=lr)  # Create a new optimizer instance with the current learning rate
             history = self.fashion_model.train_model(optimizer, epochs, verbose)
-            for epoch in range(epochs):
+            for epoch in range(len(history.history['val_accuracy'])):
                 accuracy = history.history['val_accuracy'][epoch]
                 results.append((epoch + 1, lr, accuracy))
         return results
@@ -32,11 +31,11 @@ class TestFashionMNISTModel:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-        epochs = [result[0] for result in results]
+        epochs_list = [result[0] for result in results]
         learning_rates = [result[1] for result in results]
         accuracies = [result[2] for result in results]
 
-        scatter = ax.scatter(epochs, learning_rates, accuracies, c=accuracies, cmap='viridis')
+        scatter = ax.scatter(epochs_list, learning_rates, accuracies, c=accuracies, cmap='viridis')
 
         ax.set_xlabel('Epochs')
         ax.set_ylabel('Learning Rate')
@@ -54,9 +53,9 @@ if __name__ == "__main__":
     test_model = TestFashionMNISTModel()
     
     optimizers = {
-        "Adam": keras.optimizers.Adam(),
-        "RMSprop": keras.optimizers.RMSprop(),
-        "Adagrad": keras.optimizers.Adagrad()
+        "Adam": keras.optimizers.Adam,
+        "RMSprop": keras.optimizers.RMSprop,
+        "Adagrad": keras.optimizers.Adagrad
     }
 
     # Define learning rate ranges for each epoch configuration
@@ -64,10 +63,10 @@ if __name__ == "__main__":
     learning_rates_80 = np.concatenate([np.arange(0.01, 0.1, 0.01), np.arange(0.1, 1.1, 0.1)])
     learning_rates_160 = np.logspace(-5, -1, num=20)  # Example learning rates for 160 epochs
 
-    for optimizer_name, optimizer in optimizers.items():
-        results_40 = test_model.test_with_optimizer(optimizer, 40, learning_rates_40)
-        results_80 = test_model.test_with_optimizer(optimizer, 80, learning_rates_80)
-        results_160 = test_model.test_with_optimizer(optimizer, 160, learning_rates_160)
+    for optimizer_name, optimizer_class in optimizers.items():
+        results_40 = test_model.test_with_optimizer(optimizer_class, 40, learning_rates_40)
+        results_80 = test_model.test_with_optimizer(optimizer_class, 80, learning_rates_80)
+        results_160 = test_model.test_with_optimizer(optimizer_class, 160, learning_rates_160)
 
         test_model.plot_results(results_40, 40, f"{optimizer_name}_40")
         test_model.plot_results(results_80, 80, f"{optimizer_name}_80")

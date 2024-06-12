@@ -1,7 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import os
 
 class FashionMNISTModel:
     def __init__(self):
@@ -12,7 +14,7 @@ class FashionMNISTModel:
 
     def load_data(self):
         self.data = keras.datasets.fashion_mnist
-        
+
     def preprocess_data(self):
         (self.train_images, self.train_labels), (self.test_images, self.test_labels) = self.data.load_data()
         
@@ -59,7 +61,6 @@ class FashionMNISTModel:
         )
         
         return history
-
 
     def evaluate_model(self):
         test_loss, test_acc = self.model.evaluate(self.test_images, self.test_labels)
