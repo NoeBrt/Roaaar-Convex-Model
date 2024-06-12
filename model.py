@@ -8,7 +8,7 @@ import os,sys
 
 from IPython.display import Markdown
 from importlib import reload
-tf.test.is_gpu_available()
+tf.test.is_gpu_available('GPU')
 
 
 data = keras.datasets.fashion_mnist
@@ -63,18 +63,18 @@ test_images = test_images / 255.0
 
 train_images[0].shape
 
-
-
-from keras import models
-from keras import layers
+from keras import models, layers, regularizers
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
     layers.MaxPooling2D((2, 2)),
+    layers.Dropout(0.25),  # Dropout après la première couche de pooling
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.MaxPooling2D((2, 2)),
+    layers.Dropout(0.25),  # Dropout après la deuxième couche de pooling
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.Flatten(),
-    layers.Dense(64, activation='relu'),
+    layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.001)),  # Régularisation L2
+    layers.Dropout(0.5),  # Dropout après la couche dense
     layers.Dense(10, activation='softmax')
 ])
 
@@ -83,9 +83,12 @@ from keras.callbacks import EarlyStopping
 from keras.models import load_model
 
 
-
+model.summary()
 
 es = EarlyStopping(monitor="val_loss",patience=20)
 mc = ModelCheckpoint("model_best.keras",save_best_only=True)
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 history=model.fit(train_images,train_labels,epochs=200,batch_size=128,validation_split=0.2,validation_data=(test_images,test_labels),callbacks=[es,mc])
+
+test_loss, test_acc = model.evaluate(test_images,test_labels)
+print('\nTest accuracy:', test_acc)
