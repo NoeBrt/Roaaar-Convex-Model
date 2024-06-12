@@ -40,21 +40,26 @@ class FashionMNISTModel:
         ])
         self.model.summary()
 
-    def train_model(self, optimizer, epochs, verbose=1):
+    def train_model(self, optimizer, epochs, verbose=1, best_model_path="models/model_best", batch_size=128, validation_split=0.2, patience=20):
         from keras.callbacks import ModelCheckpoint, EarlyStopping
 
-        es = EarlyStopping(monitor="val_loss", patience=20)
-        mc = ModelCheckpoint("model_best.keras", save_best_only=True)
+        es = EarlyStopping(monitor="val_loss", patience=patience)
+        mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}.keras", save_best_only=True)
         
         self.model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         
         history = self.model.fit(
-            self.train_images, self.train_labels, epochs=epochs, batch_size=128,
-            validation_split=0.2, validation_data=(self.test_images, self.test_labels),
-            callbacks=[es, mc], verbose=verbose
+            self.train_images, self.train_labels, 
+            epochs=epochs, 
+            batch_size=batch_size, 
+            validation_split=validation_split, 
+            validation_data=(self.test_images, self.test_labels), 
+            callbacks=[es, mc], 
+            verbose=verbose
         )
         
         return history
+
 
     def evaluate_model(self):
         test_loss, test_acc = self.model.evaluate(self.test_images, self.test_labels)

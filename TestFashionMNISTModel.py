@@ -22,29 +22,32 @@ class TestFashionMNISTModel:
             keras.backend.clear_session()  # Clear previous models from memory
             self.fashion_model.build_model()
             optimizer.lr = lr
-            history = self.fashion_model.train_model(optimizer, epochs, verbose=verbose)
-            accuracy = max(history.history['val_accuracy'])
-            results.append((lr, accuracy))
+            history = self.fashion_model.train_model(optimizer, epochs, verbose)
+            for epoch in range(epochs):
+                accuracy = history.history['val_accuracy'][epoch]
+                results.append((epoch + 1, lr, accuracy))
         return results
 
     def plot_results(self, results, epochs, optimizer_name):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        
-        for result in results:
-            learning_rates = [r[0] for r in result]
-            accuracies = [r[1] for r in result]
-            epoch_vals = [epochs] * len(learning_rates)
-            ax.scatter(learning_rates, accuracies, epoch_vals)
 
-        ax.set_xlabel('Learning Rate')
-        ax.set_ylabel('Validation Accuracy')
-        ax.set_zlabel('Epochs')
+        epochs = [result[0] for result in results]
+        learning_rates = [result[1] for result in results]
+        accuracies = [result[2] for result in results]
+
+        scatter = ax.scatter(epochs, learning_rates, accuracies, c=accuracies, cmap='viridis')
+
+        ax.set_xlabel('Epochs')
+        ax.set_ylabel('Learning Rate')
+        ax.set_zlabel('Validation Accuracy')
         title = f"{optimizer_name}_FashionMNIST"
         ax.set_title(title)
+        fig.colorbar(scatter, ax=ax, label='Validation Accuracy')
 
         # Save the plot
-        plt.savefig(os.path.join(self.results_dir, f"{title}.png"))
+        file_path = os.path.join(self.results_dir, f"{optimizer_name}-{epochs}.png")
+        plt.savefig(file_path)
         plt.show()
 
 if __name__ == "__main__":
@@ -66,6 +69,6 @@ if __name__ == "__main__":
         results_80 = test_model.test_with_optimizer(optimizer, 80, learning_rates_80)
         results_160 = test_model.test_with_optimizer(optimizer, 160, learning_rates_160)
 
-        test_model.plot_results([results_40], 40, f"{optimizer_name}_40")
-        test_model.plot_results([results_80], 80, f"{optimizer_name}_80")
-        test_model.plot_results([results_160], 160, f"{optimizer_name}_160")
+        test_model.plot_results(results_40, 40, f"{optimizer_name}_40")
+        test_model.plot_results(results_80, 80, f"{optimizer_name}_80")
+        test_model.plot_results(results_160, 160, f"{optimizer_name}_160")
