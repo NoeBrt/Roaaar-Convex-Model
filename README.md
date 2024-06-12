@@ -73,5 +73,6 @@ The `TestFashionMNISTModel` class in `test_fashion_mnist_model.py` tests the mod
 - [Fashion MNIST Dataset](https://github.com/zalandoresearch/fashion-mnist)
 - [Lion Optimizer Article](https://medium.com/@yash9439/lion-optimizer-73d3fd18abe9)
 
-*"le lion rugit, s'elance dans la savane" Angèle*
+*"le lion rugit, s'elance dans la savane"* 
+*- Angèle, L'Art De Rendre Compte*
 
