@@ -1,4 +1,3 @@
----
 # Fashion MNIST Model Optimization
 
 ## Table of Contents
@@ -75,4 +74,4 @@ The `TestFashionMNISTModel` class in `test_fashion_mnist_model.py` tests the mod
 - [Lion Optimizer Article](https://medium.com/@yash9439/lion-optimizer-73d3fd18abe9)
 
 *"le lion rugit, s'elance dans la savane" Angèle*
----
+
