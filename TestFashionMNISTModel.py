@@ -99,8 +99,10 @@ if __name__ == "__main__":
 
     # Create a dictionary to store results
     all_results = {}
-
+    for optimizer_name, optimizer_class in optimizers.items():
+        process_optimizer(optimizer_name, optimizer_class, test_model, learning_rates_40, 40)
     # Use ThreadPoolExecutor to parallelize the tasks
+    '''
     with ThreadPoolExecutor() as executor:
         futures = []
         for optimizer_name, optimizer_class in optimizers.items():
@@ -111,6 +113,7 @@ if __name__ == "__main__":
         for future in as_completed(futures):
             optimizer_name, epochs, results = future.result()
             all_results[f"{optimizer_name}_{epochs}"] = results
+    '''
 
     csv_file_path = os.path.join('results', 'all_results.csv')
     os.makedirs('results', exist_ok=True)  # Ensure the results directory exists
