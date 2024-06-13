@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
+import keras.backend as K
 class FashionMNISTModel:
     def __init__(self):
         self.class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
                             "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
         self.model = None
         self.data = None
+        tf.config.list_physical_devices('GPU')
 
     def load_data(self):
         print("Loading data...")
@@ -52,7 +54,7 @@ class FashionMNISTModel:
 
         print("Training model...")
         es = EarlyStopping(monitor="val_loss", patience=patience)
-        mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}.keras", save_best_only=True)
+        mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}-lr{optimizer.learning_rate.numpy()}.keras", save_best_only=True)
         
         self.model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         
