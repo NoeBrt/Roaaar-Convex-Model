@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
-
 class FashionMNISTModel:
     def __init__(self):
         self.class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
@@ -13,9 +12,12 @@ class FashionMNISTModel:
         self.data = None
 
     def load_data(self):
+        print("Loading data...")
         self.data = keras.datasets.fashion_mnist
+        print("Data loaded successfully!")
 
     def preprocess_data(self):
+        print("Preprocessing data...")
         (self.train_images, self.train_labels), (self.test_images, self.test_labels) = self.data.load_data()
         
         self.train_images = self.train_images / 255.0
@@ -23,8 +25,10 @@ class FashionMNISTModel:
         
         self.train_images = np.expand_dims(self.train_images, -1)
         self.test_images = np.expand_dims(self.test_images, -1)
+        print("Data preprocessed successfully!")
 
     def build_model(self):
+        print("Building model...")
         from keras import models, layers, regularizers
 
         self.model = models.Sequential([
@@ -41,10 +45,12 @@ class FashionMNISTModel:
             layers.Dense(10, activation='softmax')
         ])
         self.model.summary()
+        print("Model built successfully!")
 
     def train_model(self, optimizer, epochs, verbose=1, best_model_path="models/model_best", batch_size=128, validation_split=0.2, patience=20):
         from keras.callbacks import ModelCheckpoint, EarlyStopping
 
+        print("Training model...")
         es = EarlyStopping(monitor="val_loss", patience=patience)
         mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}.keras", save_best_only=True)
         
@@ -60,25 +66,13 @@ class FashionMNISTModel:
             verbose=verbose
         )
         
+        print("Model trained successfully!")
         return history
 
     def evaluate_model(self):
+        print("Evaluating model...")
         test_loss, test_acc = self.model.evaluate(self.test_images, self.test_labels)
         print('\nTest accuracy:', test_acc)
         return test_acc
 
-    def visualize_sample(self, index):
-        plt.figure()
-        plt.imshow(self.train_images[index].reshape(28, 28), cmap='gray')
-        plt.grid(False)
-        plt.title(self.class_names[self.train_labels[index]])
-        plt.show()
 
-    def visualize_samples(self):
-        plt.figure(figsize=(20, 20))
-        for i in range(25):
-            plt.subplot(5, 5, i + 1)
-            plt.imshow(self.train_images[i].reshape(28, 28), cmap='gray')
-            plt.title(self.class_names[int(self.train_labels[i])])
-            plt.axis('off')
-        plt.show()
