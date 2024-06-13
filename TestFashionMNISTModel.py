@@ -53,9 +53,13 @@ if __name__ == "__main__":
     test_model = TestFashionMNISTModel()
     
     optimizers = {
+        "Lion": keras.optimizers.Lion,
+        "Nadam": keras.optimizers.Nadam,
         "Adam": keras.optimizers.Adam,
         "RMSprop": keras.optimizers.RMSprop,
-        "Adagrad": keras.optimizers.Adagrad
+        "Adagrad": keras.optimizers.Adagrad,
+        "SGD": keras.optimizers.SGD,
+        
     }
 
     # Define learning rate ranges for each epoch configuration
