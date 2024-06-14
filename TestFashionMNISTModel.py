@@ -6,7 +6,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 from FashionMNISTModel import FashionMNISTModel
 import concurrent.futures
-import csv 
+import csv
+from scipy.interpolate import griddata
 
 class TestFashionMNISTModel:
     def __init__(self):
@@ -43,24 +44,26 @@ class TestFashionMNISTModel:
         learning_rates = np.array([result[1] for result in results])
         accuracies = np.array([result[2] for result in results])
 
-        # Sort learning rates in descending order
-        sorted_learning_rates = np.sort(np.unique(learning_rates))
+        # Create a grid for interpolation
+        epochs_grid, lr_grid = np.meshgrid(
+            np.linspace(epochs_list.min(), epochs_list.max(), 100),
+            np.linspace(learning_rates.min(), learning_rates.max(), 100)
+        )
 
-        # Create a grid for plotting surface
-        epochs_grid, lr_grid = np.meshgrid(np.unique(epochs_list), sorted_learning_rates)
-        accuracies_grid = np.zeros_like(epochs_grid, dtype=float)
+        # Include initial accuracy values
+        initial_accuracy = 0
+        accuracies = np.insert(accuracies, 0, initial_accuracy)
+        epochs_list = np.insert(epochs_list, 0, 0)
+        learning_rates = np.insert(learning_rates, 0, learning_rates.min())
 
-        for i in range(epochs_grid.shape[0]):
-            for j in range(epochs_grid.shape[1]):
-                condition = (epochs_list == epochs_grid[i, j]) & (learning_rates == lr_grid[i, j])
-                if np.any(condition):
-                    accuracies_grid[i, j] = accuracies[condition][0]
+        # Interpolate accuracies
+        accuracies_grid = griddata((epochs_list, learning_rates), accuracies, (epochs_grid, lr_grid), method='linear')
 
         # Plot for the optimizer
         ax1 = fig.add_subplot(111, projection='3d')
         surface = ax1.plot_surface(epochs_grid, lr_grid, accuracies_grid, cmap='viridis')
         ax1.set_xlabel('Epochs')
-        #invert y axis
+        # invert y axis
         ax1.set_ylim(ax1.get_ylim()[::-1])
         ax1.set_ylabel('Learning Rate')
         ax1.set_zlabel('Validation Accuracy')
@@ -125,7 +128,7 @@ if __name__ == "__main__":
         "RMSprop": keras.optimizers.RMSprop,
         "Adagrad": keras.optimizers.Adagrad,
         "AdamW": keras.optimizers.AdamW,
-        "SGD": keras.optimizers.SGD
+        #"SGD": keras.optimizers.SGD
     }
 
     # Define learning rate ranges for each epoch configuration
@@ -140,9 +143,9 @@ if __name__ == "__main__":
     all_results = {}
 
     for optimizer_name, optimizer_class in optimizers.items():
-        epochs = 40
-        _, _, results_40 = process_optimizer(optimizer_name, optimizer_class, learning_rates_40, epochs)
-        all_results[f"{optimizer_name}_40"] = results_40
+        epochs = 160
+        _, _, results_40 = process_optimizer(optimizer_name, optimizer_class, learning_rates_160, epochs)
+        all_results[f"{optimizer_name}_160"] = results_40
         test_model.save_plot_results(results_40, epochs, optimizer_name)
 
     test_model.plot_and_show_results(all_results)
