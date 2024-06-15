@@ -67,6 +67,12 @@ The `FashionMNISTModel` class in `fashion_mnist_model.py` handles data loading, 
 ### TestFashionMNISTModel Class
 The `TestFashionMNISTModel` class in `test_fashion_mnist_model.py` tests the model with various learning rates and epochs, and visualizes the results.
 
+
+### Example visualisation
+![Lion-40](https://github.com/NoeBrt/Roaaar-Convex-Model/assets/94910317/0307afc3-f090-4049-8578-cd6947d740dd)
+
+
+
 ## References
 - [TensorFlow Documentation](https://www.tensorflow.org/api_docs)
 - [Keras Documentation](https://keras.io/api/)
