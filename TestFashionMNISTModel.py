@@ -120,7 +120,9 @@ class TestFashionMNISTModel:
 
 if __name__ == "__main__":
     test_model = TestFashionMNISTModel()
-    
+    model = FashionMNISTModel().build_model()
+    print(model.summary())
+    print(test_model.fashion_model.model.summary)
     optimizers = {
         "Lion": keras.optimizers.Lion,
         "Nadam": keras.optimizers.Nadam,

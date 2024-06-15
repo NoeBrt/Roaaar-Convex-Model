@@ -16,6 +16,7 @@ class FashionMNISTModel:
     def load_data(self):
         print("Loading data...")
         self.data = keras.datasets.fashion_mnist
+        print(self.data.shape)
         print("Data loaded successfully!")
 
     def preprocess_data(self):
@@ -54,9 +55,12 @@ class FashionMNISTModel:
 
         print("Training model...")
         es = EarlyStopping(monitor="val_loss", patience=patience)
-        mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}-lr{optimizer.learning_rate.numpy()}.keras", save_best_only=True)
+        mc = ModelCheckpoint(f"{best_model_path}-{optimizer.__class__.__name__}-ep{epochs}-lr{optimizer.learning_rate.numpy()}.keras", 
+                             save_best_only=True)
         
-        self.model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        self.model.compile(optimizer=optimizer, 
+                           loss='sparse_categorical_crossentropy', 
+                           metrics=['accuracy'])
         
         history = self.model.fit(
             self.train_images, self.train_labels, 
